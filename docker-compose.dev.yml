@@ -1,0 +1,31 @@
+# This is just an example of of creating a Drupal 8 site with Islandora from
+# scratch as a series of startup scripts before the nginx server starts.
+#
+# Its primary use is for testing changes to the containers.
+#
+# Organizations should not use this as their base instead they should refer
+# to the documentation in this project for the correct approach.
+version: "3.7"
+networks:
+  default:
+    internal: true
+  proxy:
+    external:
+      name: nginx-proxy
+
+volumes:
+  drupal-sites-data:
+services:
+  # The service name is drupal that is the default host name used by micro-services etc.
+  drupal:
+    image: ${REPOSITORY:-islandora}/demo:${TAG:-latest}
+    volumes:
+      - drupal-sites-data:/var/www/drupal/web/sites/default/files
+    depends_on:
+      # Demo cannot start unless these services are running.
+      - fcrepo
+      - ${DRUPAL_DATABASE_SERVICE}
+      - activemq
+      - blazegraph
+    extra_hosts:
+      - "solr:10.10.0.101"

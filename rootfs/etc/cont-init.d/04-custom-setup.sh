@@ -1,7 +1,8 @@
 #!/usr/bin/with-contenv bash
 set -e
+set -x
 
-source /etc/islandora/utilities.sh
+# source /etc/islandora/utilities.sh
 
 function main {
     local site="default"
@@ -15,14 +16,14 @@ function main {
     update_settings_php "${site}"
     # Ensure that settings which depend on environment variables like service urls are set dynamically on startup.
     configure_islandora_module "${site}"
-    configure_matomo_module "${site}"
+    # configure_matomo_module "${site}"
     configure_openseadragon "${site}"
     configure_islandora_default_module "${site}"
     # The following commands require several services
     # to be up and running before they can complete.
     wait_for_required_services "${site}"
     # Create missing solr cores.
-    create_solr_core_with_default_config "${site}"
+    # create_solr_core_with_default_config "${site}"
     # Create namespace assumed one per site.
     create_blazegraph_namespace_with_default_properties "${site}"
     # Need to run migration to get expected default content, now that our required services are running.
@@ -37,8 +38,8 @@ use Drupal\taxonomy\Entity\Term;
 \$term->set('field_external_uri', \$default);
 \$term->save();
 EOF
-    drush php:script /tmp/fix.php
+    drush -v php:script /tmp/fix.php
     # Rebuild the cache.
     drush cr
 }
-main
+# main
